@@ -11,6 +11,10 @@ The progamm uses LLM to find contact information from list of websites. For exam
 - [@Prshkv](https://www.github.com/Prshkv)
 - [@VeeraElo](https://www.github.com/VeeraElo)
 - [@EnergyJoe](https://www.github.com/Energyjoe)
+- [@Matimane](https://www.github.com/Matimane)
+- [@Eetuhellberg](https://www.github.com/eetuhellberg)
+
+
 
 
 ## Tech Stack
