@@ -41,22 +41,23 @@ try:
     full_prompt = (
         f"Here is the content of a webpage:\n\n{markdown_content}\n\n"
         "--------------------------------------------------\n"
-        "TASK: Extract all contact details found in the text above.\n"
-        "OUTPUT FORMAT: Return a valid JSON list of objects inside a markdown code block (```json ... ```).\n"
-        "FIELDS REQUIRED: occupation, first name, last name, email, telephone, address.\n"
-        "if information on how to construct email from name information is given, construct the email address"
     )
 
     data = {
         "model": OLLAMA_MODEL,
         "prompt": full_prompt,
-        "system": "You are a data extraction assistant.",
+        "system": (
+            "You are a data extraction assistant."
+            "TASK: Extract all contact details found in the text above.\n"
+            "OUTPUT FORMAT: Return a valid JSON list of objects inside a markdown code block (```json ... ```).\n"
+            "FIELDS REQUIRED: occupation, first name, last name, email, telephone, address.\n"
+            "if information on how to construct email from name information is given, construct the email address"
+        ),
         "stream": False,
         "options": {
             "temperature": 0.0,
             "top_p": 1.0,
             "num_predict": 8192,
-            "reasoning_effort": "low",
         },
     }
 except Exception as e:
