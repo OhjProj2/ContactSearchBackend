@@ -14,6 +14,34 @@ OLLAMA_USERNAME = os.getenv("OLLAMA_USERNAME")
 OLLAMA_PASSWORD = os.getenv("OLLAMA_PASSWORD")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL")
 
+model_list = [
+    "gemma3:12b",
+    "llama3.3:70b",
+    "qwen3-coder:latest",
+    "gpt-oss:120b",
+    "gpt-oss:20b",
+    "qwen3-next:latest",
+]
+
+for i, model in enumerate(model_list):
+    print(f"{i} {model}")
+
+OLLAMA_MODEL = model_list[int(input("Choose a model: "))]
+print(f"Chosen model: {OLLAMA_MODEL}")
+
+url_list = [
+    "https://www.sdp.fi/ota-yhteytta/yhteystiedot/kansanedustajat/",
+    "https://www.kerava.fi/kasvatus-ja-opetus/perusopetus/peruskoulut/ahjo/",
+    "https://slme.fi",
+    "https://smey.fi/yhteystiedot",
+]
+
+for i, url in enumerate(url_list):
+    print(f"{i} {url}")
+
+URL_FETCH = url_list[int(input("Choose a URL: "))]
+print(f"Chosen URL: {URL_FETCH}")
+
 
 async def main():
     # Create Basic Auth header
@@ -29,7 +57,8 @@ async def main():
         # timeout=300.0,  # 5 minute timeout for large prompts
     )
 
-    url_input = input("Enter a URL to fetch contact details from:\n>")
+    # url_input = input("Enter a URL to fetch contact details from:\n>")
+    url_input = URL_FETCH
     try:
         target_url = (
             url_input
@@ -71,7 +100,10 @@ FIELDS REQUIRED for each contact:
 - last_name
 - email
 - telephone
-- address
+- street_address
+- postal_code
+- city
+- country
 - web_page
 - social_media
 - business_id
