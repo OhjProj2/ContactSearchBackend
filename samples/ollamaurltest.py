@@ -1,9 +1,10 @@
-import requests
-import urllib3
+import asyncio
+import base64
 import os
 import json
 from dotenv import load_dotenv
-from markdownify import markdownify as md
+from ollama import AsyncClient
+from crawl4ai import *
 
 load_dotenv()
 
@@ -13,78 +14,122 @@ OLLAMA_USERNAME = os.getenv("OLLAMA_USERNAME")
 OLLAMA_PASSWORD = os.getenv("OLLAMA_PASSWORD")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL")
 
-urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
-port = OLLAMA_PORT
+async def main():
+    # Create Basic Auth header
+    auth_string = base64.b64encode(
+        f"{OLLAMA_USERNAME or ''}:{OLLAMA_PASSWORD or ''}".encode()
+    ).decode()
 
-url = f"{OLLAMA_URL}:{OLLAMA_PORT}/api/generate"
-auth = (OLLAMA_USERNAME or "", OLLAMA_PASSWORD or "")
-url_input = input("Enter a URL to fetch contact details from:\n>")
-try:
-    # Fetch the URL content directly
-    target_url = (
-        url_input
-        if url_input.startswith(("http://", "https://"))
-        else f"https://{url_input}"
+    # Initialize Ollama AsyncClient with custom host, auth, and SSL verification disabled
+    client = AsyncClient(
+        host=f"{OLLAMA_URL}:{OLLAMA_PORT}",
+        headers={"Authorization": f"Basic {auth_string}"},
+        verify=False,  # Disable SSL verification for self-signed certs
+        # timeout=300.0,  # 5 minute timeout for large prompts
     )
-    web_response = requests.get(target_url, verify=False)
-    if web_response.status_code != 200:
-        print(f"Failed to fetch URL: {web_response.status_code}")
+
+    url_input = input("Enter a URL to fetch contact details from:\n>")
+    try:
+        target_url = (
+            url_input
+            if url_input.startswith(("http://", "https://"))
+            else f"https://{url_input}"
+        )
+
+        async with AsyncWebCrawler() as crawler:
+            result = await crawler.arun(url=target_url)
+            if not result.success:
+                print(
+                    f"Failed to fetch URL: {result.status_code if hasattr(result, 'status_code') else 'unknown'}"
+                )
+                exit(1)
+
+            markdown_content = result.markdown
+            print(
+                f"DEBUG: Fetched {len(result.html if hasattr(result, 'html') else '')} characters from URL."
+            )
+            print(f"DEBUG: Markdown content length: {len(markdown_content)}")
+
+            user_prompt = f"Here is the content of a webpage:\n\n{markdown_content}"
+
+    except Exception as e:
+        print(f"Error fetching URL: {e}")
         exit(1)
 
-    print(f"DEBUG: Fetched {len(web_response.text)} characters from URL.")
+    # System message with task instructions
+    system_prompt = """You are a data extraction assistant specialized in extracting contact information from webpages.
 
-    markdown_content = md(web_response.text)
-    print(f"DEBUG: Markdown content length: {len(markdown_content)}")
+TASK: Extract all contact details found in the provided webpage content.
 
-    # Construct a clear prompt with the content and instructions
-    full_prompt = (
-        f"Here is the content of a webpage:\n\n{markdown_content}\n\n"
-        "--------------------------------------------------\n"
-        "TASK: Extract all contact details found in the text above.\n"
-        "OUTPUT FORMAT: Return a valid JSON list of objects inside a markdown code block (```json ... ```).\n"
-        "FIELDS REQUIRED: occupation, first name, last name, email, telephone, address.\n"
-        "if information on how to construct email from name information is given, construct the email address"
+OUTPUT FORMAT: Return a valid JSON list of objects.
+
+FIELDS REQUIRED for each contact:
+- occupation
+- organization
+- first_name
+- last_name
+- email
+- telephone
+- address
+- web_page
+- social_media
+- business_id
+- company_name
+- ngo_name
+- political_party
+
+RULES:
+- If information on how to construct an email from name information is given, construct the email address even if one isn't explicitly provided.
+- Use null for missing fields.
+- Return an empty list [] if no contacts are found."""
+
+    # Call Ollama using the Python library with streaming
+    print("\n--- Streaming response ---")
+    print(
+        "Processing large prompt... (this may take 30-90 seconds due to model prefill)"
     )
-
-    data = {
-        "model": OLLAMA_MODEL,
-        "prompt": full_prompt,
-        "system": "You are a data extraction assistant.",
-        "stream": False,
-        "options": {
+    response_text = ""
+    async for chunk in await client.generate(
+        model=OLLAMA_MODEL,
+        prompt=user_prompt,
+        system=system_prompt,
+        stream=True,
+        options={
             "temperature": 0.0,
             "top_p": 1.0,
-            "num_predict": 8192,
-            "reasoning_effort": "low",
+            "num_predict": 30000,
+            "num_ctx": 65536,  # 64k context window for large webpages
         },
-    }
-except Exception as e:
-    print(f"Error fetching URL: {e}")
-    exit(1)
+    ):
+        chunk_text = (
+            chunk.get("response", "")
+            if isinstance(chunk, dict)
+            else getattr(chunk, "response", "")
+        )
+        print(chunk_text, end="", flush=True)
+        response_text += chunk_text
 
-response = requests.post(url, json=data, auth=auth, verify=False)
-response_data = response.json()
+    print("\n--- End of response ---\n")
 
-response_text = response_data.get("response", "")
-
-if not response_text:
-    print("No response text found. Full API response:")
-    print(response_data)
-else:
-    # Try to extract JSON from code block
-    import re
-
-    match = re.search(r"```json\s*(.*?)```", response_text, re.DOTALL)
-    if match:
-        json_str = match.group(1)
+    if not response_text:
+        print("No response text found.")
     else:
-        # Fallback: assume the whole text might be JSON if no code block
-        json_str = response_text
+        import re
 
-    try:
-        json_output = json.loads(json_str)
-        print(json.dumps(json_output, indent=2, ensure_ascii=False))
-    except json.JSONDecodeError:
-        print("Could not parse JSON. Raw response:")
-        print(response_text)
+        match = re.search(r"```json\s*(.*?)```", response_text, re.DOTALL)
+        if match:
+            json_str = match.group(1)
+        else:
+            json_str = response_text
+
+        try:
+            json_output = json.loads(json_str)
+            print("\n--- Parsed JSON ---")
+            print(json.dumps(json_output, indent=2, ensure_ascii=False))
+        except json.JSONDecodeError:
+            print("Could not parse JSON from response.")
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
