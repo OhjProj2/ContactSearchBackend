@@ -5,6 +5,8 @@ import json
 from dotenv import load_dotenv
 from ollama import AsyncClient
 from crawl4ai import *
+from datetime import datetime
+from datetime import timedelta
 
 load_dotenv()
 
@@ -21,6 +23,7 @@ model_list = [
     "gpt-oss:120b",
     "gpt-oss:20b",
     "qwen3-next:latest",
+    "ministral-3:8b",
 ]
 
 for i, model in enumerate(model_list):
@@ -29,17 +32,25 @@ for i, model in enumerate(model_list):
 OLLAMA_MODEL = model_list[int(input("Choose a model: "))]
 print(f"Chosen model: {OLLAMA_MODEL}")
 
-url_list = [
-    "https://www.sdp.fi/ota-yhteytta/yhteystiedot/kansanedustajat/",
-    "https://www.kerava.fi/kasvatus-ja-opetus/perusopetus/peruskoulut/ahjo/",
-    "https://slme.fi",
-    "https://smey.fi/yhteystiedot",
-]
+print("0 Type URL")
+print("1 CHoose from list of URLs")
 
-for i, url in enumerate(url_list):
-    print(f"{i} {url}")
+URL_FETCH = ""
 
-URL_FETCH = url_list[int(input("Choose a URL: "))]
+if input(">") == "0":
+    URL_FETCH = input("Type a URL: ")
+else:
+    url_list = [
+        "https://www.sdp.fi/ota-yhteytta/yhteystiedot/kansanedustajat/",
+        "https://www.kerava.fi/kasvatus-ja-opetus/perusopetus/peruskoulut/ahjo/",
+        "https://slme.fi",
+        "https://smey.fi/yhteystiedot",
+    ]
+
+    for i, url in enumerate(url_list):
+        print(f"{i} {url}")
+
+    URL_FETCH = url_list[int(input("Choose a URL: "))]
 print(f"Chosen URL: {URL_FETCH}")
 
 
@@ -95,6 +106,7 @@ OUTPUT FORMAT: Return a valid JSON list of objects.
 
 FIELDS REQUIRED for each contact:
 - occupation
+- occupation_role
 - organization
 - first_name
 - last_name
@@ -112,21 +124,26 @@ FIELDS REQUIRED for each contact:
 - political_party
 
 RULES:
-- If information on how to construct an email from name information is given, construct the email address even if one isn't explicitly provided.
+- Construct the email address even if one isn't explicitly provided.
 - Use null for missing fields.
-- Return an empty list [] if no contacts are found."""
+- Return an empty list [] if no contacts are found.
+- If there are multiple instances of single type of contact detail, nest them."""
 
     # Call Ollama using the Python library with streaming
     print("\n--- Streaming response ---")
     print(
         "Processing large prompt... (this may take 30-90 seconds due to model prefill)"
     )
+
+    start = datetime.now()
+
     response_text = ""
     async for chunk in await client.generate(
         model=OLLAMA_MODEL,
         prompt=user_prompt,
         system=system_prompt,
         stream=True,
+        format="json",
         options={
             "temperature": 0.0,
             "top_p": 1.0,
@@ -142,6 +159,7 @@ RULES:
         print(chunk_text, end="", flush=True)
         response_text += chunk_text
 
+    end = datetime.now()
     print("\n--- End of response ---\n")
 
     if not response_text:
@@ -159,8 +177,14 @@ RULES:
             json_output = json.loads(json_str)
             print("\n--- Parsed JSON ---")
             print(json.dumps(json_output, indent=2, ensure_ascii=False))
+            with open("output.json", "w") as f:
+                json.dump(json_output, f, indent=4)
+
         except json.JSONDecodeError:
             print("Could not parse JSON from response.")
+
+        delta = end - start
+        print(f"Time elapsed: {delta.total_seconds()}")
 
 
 if __name__ == "__main__":
