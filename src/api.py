@@ -6,7 +6,7 @@ from typing import List
 from langchain_ollama import ChatOllama
 from fastapi import FastAPI
 from dotenv import load_dotenv
-from pydantic import BaseModel
+from pydantic import BaseModel, create_model
 from crawl4ai import AsyncWebCrawler
 
 env_path = Path.cwd() / ".." / "env" / ".env"
@@ -15,6 +15,20 @@ OLLAMA_URL = os.getenv("OLLAMA_URL")
 OLLAMA_PORT = os.getenv("OLLAMA_PORT")
 OLLAMA_USERNAME = os.getenv("OLLAMA_USERNAME")
 OLLAMA_PASSWORD = os.getenv("OLLAMA_PASSWORD")
+
+
+def contact_type(contact_detail: str) -> tuple:
+    if contact_detail == "social_media":
+        return (SocialMedia, ...)
+    else:
+        return (str, ...)
+
+
+def create_contact_dict(contact_details: list[str]) -> dict:
+    contact_dict = {}
+    for c in contact_details:
+        contact_dict[c] = contact_type(c)
+    return contact_dict
 
 
 class SocialMedia(BaseModel):
@@ -26,86 +40,63 @@ class SocialMedia(BaseModel):
     instagram: str
 
 
-class ContactInfo(BaseModel):
-    occupation: str
-    occupation_role: str
-    organization: str
-    first_name: str
-    last_name: str
-    email: str
-    phone: str
-    mobile_phone: str
-    street_address: str
-    postal_code: str
-    city: str
-    country: str
-    web_page: str
-    social_media: SocialMedia
-    business_id: str
-    company_name: str
-    ngo_name: str
-    political_party: str
-
-
-class ContactList(BaseModel):
-    contacts: List[ContactInfo]
-
-
-models_path = Path.cwd() / ".." / "env" / "models.txt"
-model_list = [model for model in sorted(models_path.read_text().splitlines())]
-
-system_message_path = Path.cwd() / ".." / "env" / "system_message.txt"
-system_message = system_message_path.read_text()
-
-url_list_path = Path.cwd() / ".." / "env" / "url_list.txt"
-url_list = [url for url in sorted(url_list_path.read_text().splitlines())]
-
-
 async def fetch_web_page(target_url):
     async with AsyncWebCrawler() as crawler:
         return await crawler.arun(target_url)
 
 
-if __name__ == "__main__":
-    print("=" * 25)
-    print("LIST OF MODELS")
-    print("=" * 25)
-    for i, model in enumerate(model_list, start=1):
-        print(f"{i}. {model}")
-    print("=" * 25)
-    choice_model = model_list[int(input("Choose a model: ")) - 1]
-    print(f"You chose: {choice_model}")
-    print("=" * 25)
-    print("LIST OF MODELS")
-    print("=" * 25)
-    for i, url in enumerate(url_list, start=1):
-        print(f"{i}. {url}")
-    print("=" * 25)
-    url = input("Give a URL or choose from the list:  ")
-    try:
-        choice_url = url_list[int(url) - 1]
-    except ValueError:
-        choice_url = url
-    print(f"You gave/selected: {choice_url}")
-
-    result = asyncio.run(fetch_web_page(choice_url))
-    if not result.success:
-        print(
-            f"Failed to fetch URL: {result.status_code if hasattr(result, 'status_code') else 'unknown'}"
+class SystemMessage:
+    def __init__(self, occupations: list[str] | None) -> None:
+        self.occupations = ", ".join(occupations) if occupations else None
+        self.personality = "You are a data extraction assistant specialized in extracting contact information from webpages."
+        if self.occupations:
+            self.task = f"TASK: Extract contact details of following occupations/roles found in the provided webpage content: ({self.occupations})"
+        else:
+            self.task = f"TASK: Extract all contact details found in the provided webpage content."
+        self.output_format = "OUTPUT FORMAT: Return a valid JSON list of objects."
+        self.rules = (
+            "RULES:- Construct the email address even if one isn't explicitly provided."
         )
-        exit(1)
 
+    def form(self):
+        sys_message = self.personality + "\n" + self.task + "\n" + self.rules
+        return sys_message
+
+
+class UserPrompt:
+    def __init__(self, web_content: str):
+        self.prompt = f"Here is the content of a webpage:\n\n{web_content}"
+
+    def form(self):
+        return self.prompt
+
+
+class SeekParameters(BaseModel):
+    contact_details: list[str]
+    occupations: list[str]
+    url: str
+
+
+app = FastAPI()
+
+
+@app.post("/seek/")
+async def process_request(parameters: SeekParameters):
+    result = await fetch_web_page(parameters.url)
+    if not result.success:
+        raise HTTPException(status_code=404, detail="Unable to fetch web page.")
     markdown_content = result.markdown
-    print(
-        f"DEBUG: Fetched {len(result.html if hasattr(result, 'html') else '')} characters from URL."
-    )
-    print(f"DEBUG: Markdown content length: {len(markdown_content)}")
+    system_message = SystemMessage(parameters.occupations)
+    user_prompt = UserPrompt(markdown_content)
+    contact_dict = create_contact_dict(parameters.contact_details)
+    ContactInfo = create_model("ContactInfo", **contact_dict)
 
-    user_prompt = f"Here is the content of a webpage:\n\n{markdown_content}"
+    class ContactList(BaseModel):
+        contacts: List[ContactInfo]
 
     model = ChatOllama(
         base_url=f"https://{OLLAMA_USERNAME}:{OLLAMA_PASSWORD}@{OLLAMA_URL}:{OLLAMA_PORT}",
-        model=choice_model,
+        model="ministral-3:8b",
         format="json",
         temperature=0.0,
         top_p=0.5,
@@ -115,17 +106,9 @@ if __name__ == "__main__":
         client_kwargs={"verify": False},  # because of private SSL cert
     )
 
-    # JSON must be mentioned in prompt even when 'format="json"' is given as parameter
-    messages = [
-        (
-            "system",
-            system_message,
-        ),
-        ("human", user_prompt),
-    ]
+    messages = [("system", system_message.form()), ("human", user_prompt.form())]
 
     structured_model = model.with_structured_output(ContactList)
     result = structured_model.invoke(messages)
-    print(result)
 
-    # print(model.invoke(messages))
+    return result
