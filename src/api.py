@@ -16,6 +16,10 @@ OLLAMA_PORT = os.getenv("OLLAMA_PORT")
 OLLAMA_USERNAME = os.getenv("OLLAMA_USERNAME")
 OLLAMA_PASSWORD = os.getenv("OLLAMA_PASSWORD")
 
+# To run this API:
+# 'uv run fastapi dev api.py'
+# Go to /docs/ endpoint to test functionality
+
 
 def contact_type(contact_detail: str) -> tuple:
     if contact_detail == "social_media":
