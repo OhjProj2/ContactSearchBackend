@@ -4,7 +4,7 @@ __pycache__/
 *$py.class
 *.so
 .Python
-env/
+# env/
 build/
 develop-eggs/
 dist/
@@ -26,8 +26,8 @@ MANIFEST
 # Virtual Environments
 .venv/
 venv/
-ENV/
-env/
+# ENV/
+# env/
 
 # uv
 # uv.lock is usually committed for applications, but we can keep it if needed.
@@ -45,7 +45,7 @@ htmlcov/
 .env
 .env.*
 !.env.example
-
+!.env.sample
 # IDEs
 .vscode/
 .idea/
