@@ -2,14 +2,18 @@ import requests
 import urllib3
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
-load_dotenv()
+env_path = Path.cwd() / ".." / "env" / ".env"
+load_dotenv(dotenv_path=env_path)
 
 OLLAMA_PORT = os.getenv("OLLAMA_PORT")
 OLLAMA_URL = os.getenv("OLLAMA_URL")
 OLLAMA_USERNAME = os.getenv("OLLAMA_USERNAME")
 OLLAMA_PASSWORD = os.getenv("OLLAMA_PASSWORD")
 OLLAMA_MODEL = os.getenv("OLLAMA_MODEL")
+
+print(OLLAMA_URL)
 
 model_list = [
     "gemma3:12b",
@@ -36,8 +40,10 @@ urllib3.disable_warnings(
 
 port = OLLAMA_PORT
 
-url = f"{OLLAMA_URL}:{OLLAMA_PORT}/api/generate"
+url = f"https://{OLLAMA_URL}:{OLLAMA_PORT}/api/generate"
+print(url)
 auth = (OLLAMA_USERNAME, OLLAMA_PASSWORD)
+print(auth)
 question = input("Kysy minulta mitä vain.\n>")
 data = {
     "model": OLLAMA_MODEL,
@@ -52,7 +58,11 @@ data = {
 }
 
 response = requests.post(
-    url, json=data, auth=auth, verify=False
+    url, json=data, auth=auth, verify=True
 )  # this is because of server's self signed certificate
+
+print(f"Status Code: {response.status_code}")
+print(f"Response Content: {response.text}")
+
 data = response.json()
 print(data["response"])
