@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     OLLAMA_USERNAME: str
     OLLAMA_PASSWORD: str
     OLLAMA_MODEL: str
+    OLLAMA_TEMPERATURE: float
+    OLLAMA_TOP_P: float
+    OLLAMA_NUM_PREDICT: int
+    OLLAMA_NUM_CTX: int
 
     model_config = SettingsConfigDict(env_file=ENV_PATH, env_file_encoding="utf-8")
 
