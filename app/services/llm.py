@@ -4,12 +4,11 @@ from config import Settings
 
 settings = Settings()
 
-
 def build_ollama_instance(
-    model: str, temp: float, top_p: float, num_predict: int, num_ctx: int
+    model: str | None = None, temp: float | None = None , top_p: float | None = None, num_predict: int | None = None, num_ctx: int | None = None
 ) -> ChatOllama:
     return ChatOllama(
-        base_url=f"https://{settings.OLLAMA_USERNAME}:{settings.OLLAMA_PASSWORD}@{settings.OLLAMA_URL}:{settings.OLLAMA_URL}",
+        base_url=f"https://{settings.OLLAMA_USERNAME}:{settings.OLLAMA_PASSWORD}@{settings.OLLAMA_URL}:{settings.OLLAMA_PORT}",
         model=model if model else settings.OLLAMA_MODEL,
         format="json",
         temperature=temp if temp else settings.OLLAMA_TEMPERATURE,

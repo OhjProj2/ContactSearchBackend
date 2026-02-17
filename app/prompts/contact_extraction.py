@@ -22,6 +22,12 @@ class UserPrompt:
         return self.prompt
 
 
+def build_messages(
+    system_message: SystemMessage, user_prompt: UserPrompt
+) -> list[tuple]:
+    return [("system", system_message.create()), ("human", user_prompt.create())]
+
+
 def main():
     sm = SystemMessage(["Pappi", "Lukkari", "Talonpoika", "Varas"])
     up = UserPrompt("<html>Kotisivu</html>")

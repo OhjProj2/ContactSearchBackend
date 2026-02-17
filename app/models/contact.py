@@ -28,6 +28,11 @@ class SeekParameters(BaseModel):
     contact_details: list[str]
     occupations: list[str]
     url: str
+    temp: float | None = 0.0
+    top_p: float | None = 1.0
+    num_predict: int | None = 65536
+    num_ctx: int | None = 65536
+    model: str | None = "ministral-3:8b"
 
 
 def build_contact_list_model(contact_details: list[str]) -> type[BaseModel]:
