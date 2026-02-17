@@ -1,4 +1,7 @@
 from pydantic import BaseModel, create_model
+from config import Settings
+
+settings = Settings()
 
 
 def _contact_type(contact_detail: str) -> tuple:
@@ -28,11 +31,11 @@ class SeekParameters(BaseModel):
     contact_details: list[str]
     occupations: list[str]
     url: str
-    temp: float | None = 0.0
-    top_p: float | None = 1.0
-    num_predict: int | None = 65536
-    num_ctx: int | None = 65536
-    model: str | None = "ministral-3:8b"
+    temp: float | None = settings.OLLAMA_TEMPERATURE
+    top_p: float | None = settings.OLLAMA_TOP_P
+    num_predict: int | None = settings.OLLAMA_NUM_PREDICT
+    num_ctx: int | None = settings.OLLAMA_NUM_CTX
+    model: str | None = settings.OLLAMA_MODEL
 
 
 def build_contact_list_model(contact_details: list[str]) -> type[BaseModel]:

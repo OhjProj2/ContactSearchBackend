@@ -7,7 +7,7 @@ class SystemMessage:
         else:
             self.task = f"TASK: Extract all contact details found in the provided webpage content."
         self.output_format = "OUTPUT FORMAT: Return a valid JSON list of objects."
-        self.rules = "RULES:- Construct the email address if one is explicitly provided or implicitly given as a rule of forming it from contact details."
+        self.rules = "RULES:- Construct the email address if one is explicitly or implicitly provided."
 
     def create(self):
         sys_message = self.personality + "\n" + self.task + "\n" + self.rules
