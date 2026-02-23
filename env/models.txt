@@ -5,3 +5,4 @@ gpt-oss:120b
 gpt-oss:20b
 qwen3-next:latest
 ministral-3:8b
+qwen3-coder-next:latest
