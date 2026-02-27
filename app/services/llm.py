@@ -4,6 +4,7 @@ from config import Settings
 
 settings = Settings()
 
+
 def build_ollama_instance(
     model: str, temp: float, top_p: float, num_predict: int, num_ctx: int
 ) -> ChatOllama:

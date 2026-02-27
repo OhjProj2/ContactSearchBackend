@@ -19,5 +19,5 @@ app.add_middleware(
 )
 
 from routers.seek import router as seek_router
-app.include_router(seek_router, tags=["Contact Extraction"])
 
+app.include_router(seek_router, tags=["Contact Extraction"])

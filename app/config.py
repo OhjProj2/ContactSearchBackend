@@ -5,6 +5,20 @@ ENV_PATH = Path(__file__).parent.parent / "env" / ".env"
 
 
 class Settings(BaseSettings):
+    """Main Pydantic settings class using env vars from env/.env
+
+    Attributes:
+        OLLAMA_URL: Ollama server URL
+        OLLAMA_PORT: Ollama server port
+        OLLAMA_USERNAME: Ollama username for authentication
+        OLLAMA_PASSWORD: Ollama password for authentication
+        OLLAMA_MODEL: Model name
+        OLLAMA_TEMPERATURE: Sampling temperatue (0.0-1.0)
+        OLLAMA_TOP_P: Nucleus sampling probability (0.0-1.0)
+        OLLAMA_NUM_PREDICT: Maximum tokens to predict
+        OLLAMA_NUM_CTX: Context window size
+    """
+
     OLLAMA_URL: str
     OLLAMA_PORT: str
     OLLAMA_USERNAME: str
