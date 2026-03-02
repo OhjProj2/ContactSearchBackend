@@ -27,6 +27,10 @@ The progamm uses LLM to find contact information from list of websites. For exam
 1. Run uv sync.
 1. Run uv run playwright install.
 
+### Running the backend
+
+1. uv run fastapi dev app/main.py
+
 ### External documentation
 
 [Langchain Ollama documentation](https://reference.langchain.com/python/integrations/langchain_ollama/?_gl=1*1ggao8h*_gcl_au*ODU1NTg1NTc2LjE3Njk3NjE0NDQ.*_ga*Mzg5Mzc0NTU4LjE3Njk3NjE0NDQ.*_ga_47WX3HKKY2*czE3NzAxMTQyOTUkbzIkZzEkdDE3NzAxMTQ0NzEkajUkbDAkaDA.#langchain_ollama.ChatOllama.base_url)

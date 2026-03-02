@@ -20,6 +20,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(seek_router, tags=["Contact Extraction"])
-app.include_router(listmodels_router, tags=["List Models"])
+from routers.seek import router as seek_router
 
+app.include_router(seek_router, tags=["Contact Extraction"])

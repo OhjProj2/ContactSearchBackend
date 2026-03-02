@@ -12,6 +12,22 @@ router = APIRouter()
 
 @router.post("/seek/")
 async def process_request(parameters: SeekParameters):
+    """Router that gets a structured list of contact details from Ollama model
+
+    - Fetches web page content
+    - Creates messages to be sent to LLM
+    - Builds ContactList class that's used to structure the answer
+    - Builds a ChatOllama model instance
+    - Gives the model instance a structure to follow
+    - Invokes a call to the model and returns the result
+
+    Args:
+        parameters: SeekParameters containing contact_details, occupations,
+        URL + model parameters
+
+    Returns:
+        Structured contact list extracted from the page content.
+    """
     result = await fetch_web_page(parameters.url)
     if not result.success:
         raise HTTPException(status_code=404, detail="Unable to fetch web page.")
