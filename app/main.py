@@ -1,6 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from routers.seek import router as seek_router
+from routers.listmodels import router as listmodels_router
 app = FastAPI()
 
 origins = [
@@ -18,6 +20,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-from routers.seek import router as seek_router
 app.include_router(seek_router, tags=["Contact Extraction"])
+app.include_router(listmodels_router, tags=["List Models"])
 
