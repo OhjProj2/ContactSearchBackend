@@ -1,16 +1,15 @@
+#run with: uv run python main_windows.py
+
+import asyncio
+import sys
+import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers.seek import router as seek_router
-from routers.listmodels import router as listmodels_router
-app = FastAPI()
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsProactorEventLoopPolicy())
 
-origins = [
-    "http://localhost.tiangolo.com",
-    "https://localhost.tiangolo.com",
-    "http://localhost",
-    "http://localhost:8080",
-]
+app = FastAPI()
 
 app.add_middleware(
     CORSMiddleware,
@@ -21,5 +20,7 @@ app.add_middleware(
 )
 
 from routers.seek import router as seek_router
-
 app.include_router(seek_router, tags=["Contact Extraction"])
+
+if __name__ == "__main__":
+    uvicorn.run("main:app", host="127.0.0.1", port=8000, reload=False)
