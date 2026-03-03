@@ -19,6 +19,8 @@ The progamm uses LLM to find contact information from list of websites. For exam
 
 **Server:** Python, FastAPI
 
+Database: MongoDB
+
 ## Backend
 
 ### Initialization
@@ -34,3 +36,21 @@ The progamm uses LLM to find contact information from list of websites. For exam
 ### External documentation
 
 [Langchain Ollama documentation](https://reference.langchain.com/python/integrations/langchain_ollama/?_gl=1*1ggao8h*_gcl_au*ODU1NTg1NTc2LjE3Njk3NjE0NDQ.*_ga*Mzg5Mzc0NTU4LjE3Njk3NjE0NDQ.*_ga_47WX3HKKY2*czE3NzAxMTQyOTUkbzIkZzEkdDE3NzAxMTQ0NzEkajUkbDAkaDA.#langchain_ollama.ChatOllama.base_url)
+
+## Database
+
+We're using MongoDB because program's data schema is evolving constantly and there is lots of variation in contact details naturally.
+
+### Installing in Docker container
+
+Before installing MongoDB, install MongoDB Shell (mongosh). Instructions for installation:
+
+[Install mongosh](https://www.mongodb.com/docs/mongodb-shell/install/?operating-system=windows&windows-installation-method=msiexec)
+
+### [Install MongoDB Community with Docker](https://www.mongodb.com/docs/v7.0/tutorial/install-mongodb-community-with-docker/)
+
+1. Pull the docker image.
+   1. docker pull mongodb/mongodb-community-server:latest
+2. Run the docker image.
+   1. docker run --name mongodb -p 27017:27017 -d mongodb/mongodb-community-server:latest
+
