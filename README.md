@@ -1,9 +1,9 @@
 
 # ContactSearch
 
-An app for searching conract information from websites
+An app for searching contact information from websites.
 
-The progamm uses LLM to find contact information from list of websites. For example you can provide list of schools and programm tries to find principals email, phone number etc.
+The progam uses LLM to find contact information from list of websites. For example you can provide list of schools and program tries to find principals email, phone number etc.
 
 ## Authors
 
@@ -54,3 +54,6 @@ Before installing MongoDB, install MongoDB Shell (mongosh). Instructions for ins
 2. Run the docker image.
    1. docker run --name mongodb -p 27017:27017 -d mongodb/mongodb-community-server:latest
 
+### Using PyMongo library
+
+PyMongo is the recommended way to work with MongoDB from Python. Check the newest documentation from PyMongo's homepage: [PyMongo documentation](https://www.mongodb.com/docs/languages/python/pymongo-driver/current/).

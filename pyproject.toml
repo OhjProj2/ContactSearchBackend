@@ -14,6 +14,7 @@ dependencies = [
     "ollama>=0.6.1",
     "pydantic>=2.12.5",
     "pydantic-settings>=2.12.0",
+    "pymongo>=4.16.0",
     "python-dotenv>=1.2.1",
     "requests>=2.32.5",
 ]

@@ -58,6 +58,9 @@ class SeekParameters(BaseModel):
         num_predict: Max tokens to predict (defaults from settings)
         num_ctx: Context window size (defaults from settings)
         model: Model name (defaults from settings)
+        db_uri: MongoDB Universal Resource Identifier
+        db_name: MongoDB database name (one db per one project)
+        db_collection: MongoDB collection name (one collection per one kind of contact details)
     """
 
     contact_details: list[str]
@@ -68,6 +71,9 @@ class SeekParameters(BaseModel):
     num_predict: int | None = settings.OLLAMA_NUM_PREDICT
     num_ctx: int | None = settings.OLLAMA_NUM_CTX
     model: str | None = settings.OLLAMA_MODEL
+    db_uri: str | None = settings.MONGODB_URI
+    db_name: str | None = settings.MONGODB_NAME
+    db_collection: str | None = settings.MONGODB_COLLECTION
 
 
 def build_contact_list_model(contact_details: list[str]) -> type[BaseModel]:
