@@ -2,12 +2,13 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from langchain_ollama import ChatOllama
 from pymongo import AsyncMongoClient
+from pymongo.errors import ConnectionFailure
 
 from models.contact import SeekParameters, build_contact_list_model
 from services.crawler import fetch_web_page
 from services.llm import build_ollama_instance
 from prompts.contact_extraction import SystemMessage, UserPrompt, build_messages
-from services.mongodb import add_contact_details
+from services import mongodb
 import config
 
 settings = config.Settings()
@@ -34,6 +35,10 @@ async def process_request(parameters: SeekParameters):
     Returns:
         Structured contact list extracted from the page content.
     """
+    try:
+        await mongodb.ping(host=parameters.db_uri)
+    except ConnectionFailure:
+        raise HTTPException(status_code=503, detail="Database unavailable")
     result = await fetch_web_page(parameters.url)
     if not result.success:
         raise HTTPException(status_code=404, detail="Unable to fetch web page.")
@@ -51,9 +56,8 @@ async def process_request(parameters: SeekParameters):
     )
     structured_model = model.with_structured_output(ContactList)
     result = structured_model.invoke(messages)
-    await add_contact_details(
+    await mongodb.add_contact_details(
         contact_details=result,
         seek_parameters=parameters,
     )
-
     return result
