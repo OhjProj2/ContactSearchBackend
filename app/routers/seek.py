@@ -3,6 +3,7 @@ from pydantic import BaseModel
 from langchain_ollama import ChatOllama
 from pymongo import AsyncMongoClient
 from pymongo.errors import ConnectionFailure
+from timer import Timer
 
 from models.contact import SeekParameters, build_contact_list_model
 from services.crawler import fetch_web_page
@@ -39,25 +40,32 @@ async def process_request(parameters: SeekParameters):
         await mongodb.ping(host=parameters.db_uri)
     except ConnectionFailure:
         raise HTTPException(status_code=503, detail="Database unavailable")
-    result = await fetch_web_page(parameters.url)
-    if not result.success:
-        raise HTTPException(status_code=404, detail="Unable to fetch web page.")
-    markdown_content = result.markdown
-    system_message = SystemMessage(parameters.occupations)
-    user_prompt = UserPrompt(markdown_content)
-    messages = build_messages(system_message=system_message, user_prompt=user_prompt)
-    ContactList = build_contact_list_model(parameters.contact_details)
-    model: ChatOllama = build_ollama_instance(
-        model=parameters.model,
-        temp=parameters.temp,
-        top_p=parameters.top_p,
-        num_predict=parameters.num_predict,
-        num_ctx=parameters.num_ctx,
-    )
-    structured_model = model.with_structured_output(ContactList)
-    result = structured_model.invoke(messages)
+
+    async with Timer() as timer:
+        result = await fetch_web_page(parameters.url)
+        if not result.success:
+            raise HTTPException(status_code=404, detail="Unable to fetch web page.")
+        markdown_content = result.markdown
+        system_message = SystemMessage(parameters.occupations)
+        user_prompt = UserPrompt(markdown_content)
+        messages = build_messages(system_message=system_message, user_prompt=user_prompt)
+        ContactList = build_contact_list_model(parameters.contact_details)
+        model: ChatOllama = build_ollama_instance(
+            model=parameters.model,
+            temp=parameters.temp,
+            top_p=parameters.top_p,
+            num_predict=parameters.num_predict,
+            num_ctx=parameters.num_ctx,
+        )
+        structured_model = model.with_structured_output(ContactList)
+        result = structured_model.invoke(messages)
+
     await mongodb.add_contact_details(
         contact_details=result,
         seek_parameters=parameters,
     )
-    return result
+
+    return {
+        "data": result,
+        "time": round(timer.duration, 4)
+    }
