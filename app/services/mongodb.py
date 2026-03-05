@@ -1,8 +1,8 @@
 import asyncio
 
 from fastapi import HTTPException
-from ollama import StatusResponse
 from pymongo import AsyncMongoClient
+from pymongo.server_api import ServerApi
 from pymongo.errors import ConnectionFailure, InvalidURI
 
 from routers import seek
@@ -21,7 +21,7 @@ async def ping(host: str):
     Raises:
         HTTPException ConnectionFailure: If server doesn't respond
     """
-    client = AsyncMongoClient(host=host)
+    client = AsyncMongoClient(host=host, server_api=ServerApi("1"))
     try:
         await client.admin.command("ping")
     except ConnectionFailure:
@@ -44,7 +44,7 @@ async def add_contact_details(
     Raises:
         HTTPException: In case the result is not acknowledged or any exception
     """
-    client = AsyncMongoClient(host=seek_parameters.db_uri)
+    client = AsyncMongoClient(host=seek_parameters.db_uri, server_api=ServerApi("1"))
     db = client[seek_parameters.db_name]
     collection = db[seek_parameters.db_collection]
     query_results = {
