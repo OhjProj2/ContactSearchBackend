@@ -41,7 +41,7 @@ Database: MongoDB
 
 We're using MongoDB because program's data schema is evolving constantly and there is lots of variation in contact details naturally.
 
-### Installing in Docker container
+### Local setup: Installing in Docker container
 
 Before installing MongoDB, install MongoDB Shell (mongosh). Instructions for installation:
 
@@ -54,6 +54,39 @@ Before installing MongoDB, install MongoDB Shell (mongosh). Instructions for ins
 2. Run the docker image.
    1. docker run --name mongodb -p 27017:27017 -d mongodb/mongodb-community-server:latest
 
+### MongoDB Atlas cloud service
+
+Create MongoDB cloud service at [MongoDB Atlas](https://account.mongodb.com/account/login?nds=true). After creating a cluster:
+
+1. Check the current Rahti outgoing customer traffic IP address from [Docs CSC Security Guide](https://docs.csc.fi/cloud/rahti/security-guide/).
+2. Go to Network Access -> IP Access List.
+3. Whitelist the Rahti IP address.
+
 ### Using PyMongo library
 
 PyMongo is the recommended way to work with MongoDB from Python. Check the newest documentation from PyMongo's homepage: [PyMongo documentation](https://www.mongodb.com/docs/languages/python/pymongo-driver/current/).
+
+## Deployment to Rahti
+
+### Timeout setting
+
+Rahti default timeout is 60 s. Queries can take lot longer than that. To set timeout, edit route YAML file. Add or edit the line shown:
+
+```yaml
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: my-route
+  annotations:
+    haproxy.router.openshift.io/timeout: 60s <-- THIS LINE!
+```
+
+### Dockerfile
+
+A ready playwright image is used in the Dockerfile. Playwrights [Docker page](https://playwright.dev/docs/docker) has up-to-date information on the image.
+
+When Rahti deploys a pod, it creates a random user identifier (UID). Containers aren't allowed to run as root.
+
+For an image to support running as an arbitrary user, directories and files that are written to by processes in the image must be owned by the root group and be read/writable by that group. Files to be executed must also have group execute permissions.
+
+[Redhat's documentation on Openshift platform images](https://docs.redhat.com/en/documentation/openshift_container_platform/4.13/html/images/creating-images#use-uid_create-images) has detailed instructions on how to configure containers to be work with this restriction.
