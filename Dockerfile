@@ -18,8 +18,8 @@ RUN playwright install --with-deps
 COPY . .
 
 # Expose the port FastAPI runs on
-EXPOSE 8000
+EXPOSE 8080
 
 # Command to run the FastAPI application
-CMD ["fastapi", "run", "app/main.py", "--host", "0.0.0.0", "--port", "8000"]
+CMD ["fastapi", "run", "app/main.py", "--host", "0.0.0.0", "--port", "8080"]
 
