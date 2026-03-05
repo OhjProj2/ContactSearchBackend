@@ -68,6 +68,21 @@ PyMongo is the recommended way to work with MongoDB from Python. Check the newes
 
 ## Deployment to Rahti
 
+### Using other than main branch
+
+1. Go to Build -> BuildConfigs -> YAML
+2. Add/edit following line.
+
+```yaml
+  source:
+    type: Git
+    git:
+      uri: 'https://github.com/OhjProj2/ContactSearchBackend'
+      ref: sprint2mongodb <-- INSERT BRANCH HERE
+```
+
+
+
 ### Timeout setting
 
 Rahti default timeout is 60 s. Queries can take lot longer than that. To set timeout, edit route YAML file. Add or edit the line shown:
@@ -78,7 +93,7 @@ kind: Route
 metadata:
   name: my-route
   annotations:
-    haproxy.router.openshift.io/timeout: 60s <-- THIS LINE!
+    haproxy.router.openshift.io/timeout: 60s <-- TIMEOUT SETTING ON THIS LINE
 ```
 
 ### Dockerfile
@@ -89,4 +104,4 @@ When Rahti deploys a pod, it creates a random user identifier (UID). Containers 
 
 For an image to support running as an arbitrary user, directories and files that are written to by processes in the image must be owned by the root group and be read/writable by that group. Files to be executed must also have group execute permissions.
 
-[Redhat's documentation on Openshift platform images](https://docs.redhat.com/en/documentation/openshift_container_platform/4.13/html/images/creating-images#use-uid_create-images) has detailed instructions on how to configure containers to be work with this restriction.
+[Redhat's documentation on Openshift platform images](https://docs.redhat.com/en/documentation/openshift_container_platform/4.13/html/images/creating-images#use-uid_create-images) has detailed instructions on how to configure containers to work with this restriction.

@@ -25,7 +25,7 @@ COPY pyproject.toml uv.lock ./
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 RUN pip install --no-cache-dir --upgrade pip && \
-    pip install --no-cache-dir -e .
+    pip install --no-cache-dir .
 
 # Copy the rest of the application code
 COPY . .
