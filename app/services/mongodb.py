@@ -64,6 +64,18 @@ async def add_contact_details(
     return result
 
 
+async def get_contact_details(db_name: str, db_collection: str):
+    pass
+
+
+async def get_collections(db_name: str) -> list[str]:
+    pass
+
+
+async def get_dbs() -> list[str]:
+    pass
+
+
 async def test():
     seek_parameters = contact.SeekParameters(
         contact_details=[
