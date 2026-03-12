@@ -5,7 +5,7 @@ from routers.seek import router as seek_router
 from routers.listmodels import router as listmodels_router
 from routers.listdbs import router as listdbs_router
 from routers.listcollections import router as listcollections_router
-from routers.listcontactdetails import router as listcontactdetails_router
+from routers.listalldata import router as listalldata_router
 
 app = FastAPI()
 
@@ -29,4 +29,4 @@ app.include_router(seek_router, tags=["Contact Extraction"])
 app.include_router(listmodels_router, tags=["List Models"])
 app.include_router(listdbs_router, tags=["List Databases"])
 app.include_router(listcollections_router, tags=["List Collections"])
-app.include_router(listcontactdetails_router, tags=["List Saved Contact Details"])
+app.include_router(listalldata_router, tags=["List Saved Data"])

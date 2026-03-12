@@ -63,7 +63,16 @@ async def add_contact_details(
     return result
 
 
-async def get_contact_details(db_name: str, db_collection: str):
+async def get_all_data(db_name: str, db_collection: str):
+    """Asynchronous method that fetches all data from specific collection.
+
+    Args:
+        db_name: name of the database
+        db_collection: name of the collection in given database
+
+    Raises:
+        HTTPException: In case of any error
+    """
     db = client[db_name]
     collection = db[db_collection]
     try:
@@ -78,6 +87,14 @@ async def get_contact_details(db_name: str, db_collection: str):
     return result
 
 async def get_collections(db_name: str) -> list[str]:
+    """Asynchronous method that fetches all collections in specific database.
+
+    Args:
+        db_name: name of the database
+
+    Raises:
+        HTTPException: In case of any error
+    """
     db = client[db_name]
     try:
         result = await db.list_collection_names()
@@ -89,6 +106,13 @@ async def get_collections(db_name: str) -> list[str]:
 
 
 async def get_dbs() -> list[str]:
+    """Asynchronous method that fetches all databases not on ignore list.
+
+    Args:
+        None
+    Raises:
+        HTTPException: In case of any error
+    """
     ignored_dbs = ["admin", "local"] 
     try:
         all_dbs = await client.list_database_names()
