@@ -1,13 +1,18 @@
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from langchain_ollama import ChatOllama
+from pymongo import AsyncMongoClient
+from pymongo.errors import ConnectionFailure
 from timer import Timer
 
 from models.contact import SeekParameters, build_contact_list_model
 from services.crawler import fetch_web_page
 from services.llm import build_ollama_instance
 from prompts.contact_extraction import SystemMessage, UserPrompt, build_messages
+from services import mongodb
+import config
 
+settings = config.Settings()
 router = APIRouter()
 
 
@@ -20,15 +25,22 @@ async def process_request(parameters: SeekParameters):
     - Builds ContactList class that's used to structure the answer
     - Builds a ChatOllama model instance
     - Gives the model instance a structure to follow
-    - Invokes a call to the model and returns the result
+    - Invokes a call to the model
+    - Saves the result to MongoDB
+    - Returns the result
 
     Args:
         parameters: SeekParameters containing contact_details, occupations,
-        URL + model parameters
+        URL + model parameters + MongoDB parameters
 
     Returns:
         Structured contact list extracted from the page content.
     """
+    try:
+        await mongodb.ping(host=parameters.db_uri)
+    except ConnectionFailure:
+        raise HTTPException(status_code=503, detail="Database unavailable")
+
     async with Timer() as timer:
         result = await fetch_web_page(parameters.url)
         if not result.success:
@@ -47,6 +59,11 @@ async def process_request(parameters: SeekParameters):
         )
         structured_model = model.with_structured_output(ContactList)
         result = structured_model.invoke(messages)
+
+    await mongodb.add_contact_details(
+        contact_details=result,
+        seek_parameters=parameters,
+    )
 
     return {
         "data": result,

@@ -13,10 +13,13 @@ class Settings(BaseSettings):
         OLLAMA_USERNAME: Ollama username for authentication
         OLLAMA_PASSWORD: Ollama password for authentication
         OLLAMA_MODEL: Model name
-        OLLAMA_TEMPERATURE: Sampling temperatue (0.0-1.0)
-        OLLAMA_TOP_P: Nucleus sampling probability (0.0-1.0)
-        OLLAMA_NUM_PREDICT: Maximum tokens to predict
-        OLLAMA_NUM_CTX: Context window size
+        OLLAMA_TEMPERATURE: Default sampling temperature (0.0-1.0)
+        OLLAMA_TOP_P: Default nucleus sampling probability (0.0-1.0)
+        OLLAMA_NUM_PREDICT: Default maximum tokens to predict
+        OLLAMA_NUM_CTX: Default context window size
+        MONGODB_URI: Default MongoDB Universal Resource Identifier
+        MONGODB_NAME: Default MongoDB database name (one db per one project)
+        MONGODB_COLLECTION: Default MongoDB collection name (one collection per one kind of contact details)
     """
 
     OLLAMA_URL: str
@@ -28,6 +31,9 @@ class Settings(BaseSettings):
     OLLAMA_TOP_P: float
     OLLAMA_NUM_PREDICT: int
     OLLAMA_NUM_CTX: int
+    MONGODB_URI: str
+    MONGODB_NAME: str
+    MONGODB_COLLECTION: str
 
     model_config = SettingsConfigDict(env_file=ENV_PATH, env_file_encoding="utf-8")
 
