@@ -5,6 +5,10 @@ pymongo
 requests
 python-dotenv
 pydantic
+pydantic-settings
+crawl4ai
+langchain_ollama
+httpx
 
 # Testing / development dependencies
 pytest
