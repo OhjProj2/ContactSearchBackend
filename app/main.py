@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from routers.seek import router as seek_router
-from routers.listmodels import router as listmodels_router
+from app.routers.seek import router as seek_router
+from app.routers.listmodels import router as listmodels_router
 
 app = FastAPI()
 

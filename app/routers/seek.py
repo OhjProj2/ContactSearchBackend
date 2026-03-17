@@ -3,16 +3,16 @@ from pydantic import BaseModel
 from langchain_ollama import ChatOllama
 from pymongo import AsyncMongoClient
 from pymongo.errors import ConnectionFailure
-from timer import Timer
+from app.timer import Timer
 
-from models.contact import SeekParameters, build_contact_list_model
-from services.crawler import fetch_web_page
-from services.llm import build_ollama_instance
-from prompts.contact_extraction import SystemMessage, UserPrompt, build_messages
-from services import mongodb
-import config
+from app.models.contact import SeekParameters, build_contact_list_model
+from app.services.crawler import fetch_web_page
+from app.services.llm import build_ollama_instance
+from app.prompts.contact_extraction import SystemMessage, UserPrompt, build_messages
+from app.services import mongodb
+from app.config import Settings
 
-settings = config.Settings()
+settings = Settings()
 router = APIRouter()
 
 
