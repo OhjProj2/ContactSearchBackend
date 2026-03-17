@@ -9,6 +9,21 @@ on:
 jobs:
   backend-tests:
     runs-on: ubuntu-latest
+    
+    # Dummy environment variables needed for Settings to work
+    env:
+      OLLAMA_URL: http://localhost:11434
+      OLLAMA_PORT: 11434
+      OLLAMA_USERNAME: test
+      OLLAMA_PASSWORD: test
+      OLLAMA_MODEL: test-model
+      OLLAMA_TEMPERATURE: 0.1
+      OLLAMA_TOP_P: 0.9
+      OLLAMA_NUM_PREDICT: 10
+      OLLAMA_NUM_CTX: 512
+      MONGODB_URI: mongodb://localhost:27017
+      MONGODB_NAME: testdb
+      MONGODB_COLLECTION: testcollection
 
     steps:
       - name: Checkout repository
