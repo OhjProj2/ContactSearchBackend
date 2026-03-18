@@ -70,7 +70,7 @@ PyMongo is the recommended way to work with MongoDB from Python. Check the newes
 
 ### Using other than main branch
 
-1. Go to Build -> BuildConfigs -> YAML
+1. Go to Builds -> BuildConfigs -> YAML
 2. Add/edit following line.
 
 ```yaml
@@ -80,8 +80,6 @@ PyMongo is the recommended way to work with MongoDB from Python. Check the newes
       uri: 'https://github.com/OhjProj2/ContactSearchBackend'
       ref: sprint2mongodb <-- INSERT BRANCH HERE
 ```
-
-
 
 ### Timeout setting
 
