@@ -1,0 +1,47 @@
+name: Python CI
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  backend-tests:
+    runs-on: ubuntu-latest
+    
+    # Dummy environment variables needed for Settings to work
+    env:
+      OLLAMA_URL: http://localhost:11434
+      OLLAMA_PORT: 11434
+      OLLAMA_USERNAME: test
+      OLLAMA_PASSWORD: test
+      OLLAMA_MODEL: test-model
+      OLLAMA_TEMPERATURE: 0.1
+      OLLAMA_TOP_P: 0.9
+      OLLAMA_NUM_PREDICT: 10
+      OLLAMA_NUM_CTX: 512
+      MONGODB_URI: mongodb://localhost:27017
+      MONGODB_NAME: testdb
+      MONGODB_COLLECTION: testcollection
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: |
+          python -m venv venv
+          source venv/bin/activate
+          pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: |
+          source venv/bin/activate
+          PYTHONPATH=$(pwd) pytest

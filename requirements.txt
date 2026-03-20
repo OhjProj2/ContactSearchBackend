@@ -1,0 +1,16 @@
+# Production / backend dependencies
+fastapi
+uvicorn
+pymongo
+requests
+python-dotenv
+pydantic
+pydantic-settings
+crawl4ai
+langchain_ollama
+httpx
+
+# Testing / development dependencies
+pytest
+pytest-mock
+pytest-asyncio

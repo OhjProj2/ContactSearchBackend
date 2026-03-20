@@ -1,25 +1,31 @@
 [project]
 name = "contactsearch"
-version = "0.1.0"
-description = "Add your description here"
+version = "0.2.0"
+description = "Program that extracts contact details from web pages using LLM on Ollama server"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
-    "crawl4ai>=0.8.0",
-    "fastapi[standard]>=0.128.0",
-    "httpx>=0.28.1",
-    "langchain>=1.2.8",
-    "langchain-ollama>=1.0.1",
-    "markdownify>=1.2.2",
-    "ollama>=0.6.1",
-    "pydantic>=2.12.5",
-    "pydantic-settings>=2.12.0",
-    "pymongo>=4.16.0",
-    "python-dotenv>=1.2.1",
-    "requests>=2.32.5",
+  "crawl4ai>=0.8.0",
+  "fastapi[standard]>=0.128.0",
+  "httpx>=0.28.1",
+  "langchain>=1.2.8",
+  "langchain-ollama>=1.0.1",
+  "markdownify>=1.2.2",
+  "ollama>=0.6.1",
+  "pydantic>=2.12.5",
+  "pydantic-settings>=2.12.0",
+  "pymongo>=4.16.0",
+  "python-dotenv>=1.2.1",
+  "requests>=2.32.5",
 ]
 
 [dependency-groups]
 dev = [
-    "debugpy>=1.8.20",
+  "debugpy>=1.8.20",
+  "pytest>=9.0.2",
+  "pytest-asyncio>=1.3.0",
+  "pytest-mock>=3.15.1",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
