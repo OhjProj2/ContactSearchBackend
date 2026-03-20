@@ -114,31 +114,8 @@ This project includes unit and integration tests for the FastAPI backend, ensuri
 **Integration-tests:** Mocks external dependencies (LLM, web fetch, MongoDB). Verifies correct HTTP status codes and response structure
 
 ### Running tests locally
-1. Create virtual environment:
-```
-python3 -m venv .venv
-```
-2. Activate  the virtual environment:
 
-Linux / macOS
-```
-source .venv/bin/activate
-```
-Windows:
-```
-venv\Scripts\activate
-```
-3. Install dependencies:
-```
-pip install -r requirements.txt
-```
-4. Run tests:
-```
-PYTHONPATH=$(pwd) pytest
-```
-`PYTHONPATH=$(pwd)` ensures Python can find the project modules from the root directory.
-
-5. To stop virtual environment use `deactivate`
+1. Run 'uv run pytest'.
 
 ## GitHub Actions CI
 The project uses **GitHub Actions** for continuous integration. All tests run automatically on every push and pull request to the main branch.
