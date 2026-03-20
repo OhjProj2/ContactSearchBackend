@@ -103,3 +103,21 @@ When Rahti deploys a pod, it creates a random user identifier (UID). Containers 
 For an image to support running as an arbitrary user, directories and files that are written to by processes in the image must be owned by the root group and be read/writable by that group. Files to be executed must also have group execute permissions.
 
 [Redhat's documentation on Openshift platform images](https://docs.redhat.com/en/documentation/openshift_container_platform/4.13/html/images/creating-images#use-uid_create-images) has detailed instructions on how to configure containers to work with this restriction.
+
+## Tests and Continuous Integration
+This project includes unit and integration tests for the FastAPI backend, ensuring the application works correctly. Tests are written using pytest and cover the following areas:
+
+**Unit-tests:** Ensures correct string output and validation
+
+**Integration-tests:** Mocks external dependencies (LLM, web fetch, MongoDB). Verifies correct HTTP status codes and response structure
+
+### Running tests locally
+
+1. Run 'uv run pytest'.
+
+## GitHub Actions CI
+The project uses **GitHub Actions** for continuous integration. All tests run automatically on every push and pull request to the main branch.
+- Workflow is located at .github/workflows/ci.yml
+- Sets up Python and a virtual environment
+- Installs dependencies and runs unit and integration tests
+- Test results are reported directly in GitHub Actions

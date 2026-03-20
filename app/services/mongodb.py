@@ -5,11 +5,11 @@ from pymongo import AsyncMongoClient
 from pymongo.server_api import ServerApi
 from pymongo.errors import ConnectionFailure, InvalidURI
 
-from routers import seek
-from models import contact
-import config
+from app.routers import seek
+from app.models import contact
+from app.config import Settings
 
-settings = config.Settings()
+settings = Settings()
 
 client = AsyncMongoClient(host=settings.MONGODB_URI, server_api=ServerApi("1"))
 

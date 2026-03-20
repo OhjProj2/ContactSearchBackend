@@ -1,5 +1,5 @@
 from pydantic import BaseModel, create_model
-from config import Settings
+from app.config import Settings
 
 settings = Settings()
 

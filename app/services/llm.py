@@ -1,6 +1,6 @@
 from langchain_ollama import ChatOllama
 
-from config import Settings
+from app.config import Settings
 
 settings = Settings()
 
