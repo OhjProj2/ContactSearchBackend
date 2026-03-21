@@ -58,7 +58,7 @@ async def process_request(parameters: SeekParameters):
             num_ctx=parameters.num_ctx,
         )
         structured_model = model.with_structured_output(ContactList)
-        result = structured_model.invoke(messages)
+        result = await structured_model.ainvoke(messages)
 
     await mongodb.add_contact_details(
         contact_details=result,

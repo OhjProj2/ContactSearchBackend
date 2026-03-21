@@ -11,6 +11,7 @@ from app.config import Settings
 
 settings = Settings()
 
+client = AsyncMongoClient(host=settings.MONGODB_URI, server_api=ServerApi("1"))
 
 async def ping(host: str):
     """Pings MongoDB server
@@ -21,7 +22,6 @@ async def ping(host: str):
     Raises:
         HTTPException ConnectionFailure: If server doesn't respond
     """
-    client = AsyncMongoClient(host=host, server_api=ServerApi("1"))
     try:
         await client.admin.command("ping")
     except ConnectionFailure:
@@ -44,7 +44,6 @@ async def add_contact_details(
     Raises:
         HTTPException: In case the result is not acknowledged or any exception
     """
-    client = AsyncMongoClient(host=seek_parameters.db_uri, server_api=ServerApi("1"))
     db = client[seek_parameters.db_name]
     collection = db[seek_parameters.db_collection]
     query_results = {
@@ -64,16 +63,66 @@ async def add_contact_details(
     return result
 
 
-async def get_contact_details(db_name: str, db_collection: str):
-    pass
+async def get_all_data(db_name: str, db_collection: str):
+    """Asynchronous method that fetches all data from specific collection.
 
+    Args:
+        db_name: name of the database
+        db_collection: name of the collection in given database
+
+    Raises:
+        HTTPException: In case of any error
+    """
+    db = client[db_name]
+    collection = db[db_collection]
+    try:
+        cursor = collection.find({})
+        result = await cursor.to_list(length=None)
+        for doc in result:
+            doc["_id"] = str(doc["_id"])
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Read from database failed: {str(e)}"
+        )
+    return result
 
 async def get_collections(db_name: str) -> list[str]:
-    pass
+    """Asynchronous method that fetches all collections in specific database.
+
+    Args:
+        db_name: name of the database
+
+    Raises:
+        HTTPException: In case of any error
+    """
+    db = client[db_name]
+    try:
+        result = await db.list_collection_names()
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Read from database failed: {str(e)}"
+        )
+    return result
 
 
 async def get_dbs() -> list[str]:
-    pass
+    """Asynchronous method that fetches all databases not on ignore list.
+
+    Args:
+        None
+    Raises:
+        HTTPException: In case of any error
+    """
+    ignored_dbs = ["admin", "local"] 
+    try:
+        all_dbs = await client.list_database_names()
+        result = [db for db in all_dbs if db not in ignored_dbs]
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Read from database failed: {str(e)}"
+        )
+
+    return result
 
 
 async def test():
@@ -95,4 +144,7 @@ async def test():
 
 
 if __name__ == "__main__":
-    asyncio.run(test())
+    # asyncio.run(test())
+    # asyncio.run(get_collections("testdatabase"))
+    # asyncio.run(get_dbs())
+    asyncio.run(get_contact_details("testdatabase","testcollection"))
