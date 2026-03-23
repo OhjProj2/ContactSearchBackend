@@ -62,6 +62,8 @@ Create MongoDB cloud service at [MongoDB Atlas](https://account.mongodb.com/acco
 2. Go to Network Access -> IP Access List.
 3. Whitelist the Rahti IP address.
 
+NOTE: When using/testing this application locally but using MongoDB Atlas database, local computer's IP has to be whitelisted from MongoDB Atlas's cluster settings.
+
 ### Using PyMongo library
 
 PyMongo is the recommended way to work with MongoDB from Python. Check the newest documentation from PyMongo's homepage: [PyMongo documentation](https://www.mongodb.com/docs/languages/python/pymongo-driver/current/).
@@ -104,7 +106,10 @@ For an image to support running as an arbitrary user, directories and files that
 
 [Redhat's documentation on Openshift platform images](https://docs.redhat.com/en/documentation/openshift_container_platform/4.13/html/images/creating-images#use-uid_create-images) has detailed instructions on how to configure containers to work with this restriction.
 
+Astral's uv package manager is loaded separately to the image from uv's official image.
+
 ## Tests and Continuous Integration
+
 This project includes unit and integration tests for the FastAPI backend, ensuring the application works correctly. Tests are written using pytest and cover the following areas:
 
 **Unit-tests:** Ensures correct string output and validation
@@ -116,7 +121,9 @@ This project includes unit and integration tests for the FastAPI backend, ensuri
 1. Run 'uv run pytest'.
 
 ## GitHub Actions CI
+
 The project uses **GitHub Actions** for continuous integration. All tests run automatically on every push and pull request to the main branch.
+
 - Workflow is located at .github/workflows/ci.yml
 - Sets up Python and a virtual environment
 - Installs dependencies and runs unit and integration tests
