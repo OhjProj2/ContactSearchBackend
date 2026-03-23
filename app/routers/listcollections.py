@@ -1,10 +1,12 @@
 from fastapi import APIRouter, HTTPException
-from services import mongodb
-from config import Settings
+from app.services import mongodb
+from app.config import Settings
 
 settings = Settings()
-    
+
 router = APIRouter()
+
+
 @router.post("/listcollections")
 async def list_collections(db_name: str = settings.MONGODB_NAME):
     """Router that gets list of all colletions in one database on MongoDB server."""
@@ -13,4 +15,4 @@ async def list_collections(db_name: str = settings.MONGODB_NAME):
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-    return response 
+    return response
