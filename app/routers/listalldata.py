@@ -1,14 +1,19 @@
 import json
 
 from fastapi import APIRouter, HTTPException
-from services import mongodb
-from config import Settings
+from app.services import mongodb
+from app.config import Settings
 
 settings = Settings()
-    
+
 router = APIRouter()
+
+
 @router.post("/listalldata")
-async def listalldata(db_name: str = settings.MONGODB_NAME, db_collection: str = settings.MONGODB_COLLECTION):
+async def listalldata(
+    db_name: str = settings.MONGODB_NAME,
+    db_collection: str = settings.MONGODB_COLLECTION,
+):
     """Router that gets list of all data in one collection on MongoDB server."""
     try:
         response = await mongodb.get_all_data(db_name, db_collection)
