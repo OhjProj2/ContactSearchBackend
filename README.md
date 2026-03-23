@@ -108,6 +108,20 @@ For an image to support running as an arbitrary user, directories and files that
 
 Astral's uv package manager is loaded separately to the image from uv's official image.
 
+### Webhook settings
+
+Rahti supports webhooks to trigger automatic rebuilds when code is pushed.
+
+**Setup:**
+1. Create a webhook secret in Rahti (Workloads → Secrets → Create → Webhook secret).
+2. Edit BuildConfig (Actions -> Edit BuildConfig).
+3. Add a GitHub-type trigger with secret you just created.
+4. Copy the webhook URL from Builds → BuildConfigs → Webhooks section.
+5. In GitHub repo, go to Settings → Webhooks → Add webhook.
+6. Paste the URL and set content type to `application/json`.
+
+Note: If GitHub default branch is `main` but Rahti expects `master`, edit the BuildConfig YAML under Source to specify the correct branch ref.
+
 ## Tests and Continuous Integration
 
 This project includes unit and integration tests for the FastAPI backend, ensuring the application works correctly. Tests are written using pytest and cover the following areas:
