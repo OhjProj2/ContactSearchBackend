@@ -39,7 +39,7 @@ def test_seek_success():
 
         mock_model = mock_ollama.return_value
         mock_structured = mock_model.with_structured_output.return_value
-        mock_structured.invoke.return_value = mock_llm_result
+        mock_structured.ainvoke = AsyncMock(return_value=mock_llm_result)
 
         response = client.post("/seek/", json=valid_payload())
 
@@ -98,7 +98,7 @@ def test_seek_response_structure():
 
         mock_model = mock_ollama.return_value
         mock_structured = mock_model.with_structured_output.return_value
-        mock_structured.invoke.return_value = mock_llm_result
+        mock_structured.ainvoke = AsyncMock(return_value=mock_llm_result)
 
         response = client.post("/seek/", json=valid_payload())
 
@@ -125,7 +125,7 @@ def test_seek_saves_to_db():
 
         mock_model = mock_ollama.return_value
         mock_structured = mock_model.with_structured_output.return_value
-        mock_structured.invoke.return_value = mock_llm_result
+        mock_structured.ainvoke = AsyncMock(return_value=mock_llm_result)
 
         client.post("/seek/", json=valid_payload())
 
@@ -147,7 +147,7 @@ def test_empty_llm_response():
 
         mock_model = mock_ollama.return_value
         mock_structured = mock_model.with_structured_output.return_value
-        mock_structured.invoke.return_value = {}
+        mock_structured.ainvoke = AsyncMock(return_value={})
 
         response = client.post("/seek/", json=valid_payload())
 
