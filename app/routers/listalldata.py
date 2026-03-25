@@ -1,8 +1,8 @@
 import json
 
 from fastapi import APIRouter, HTTPException
-from services import mongodb
-from config import Settings
+from app.services import mongodb
+from app.config import Settings
 
 settings = Settings()
     
