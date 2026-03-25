@@ -62,6 +62,8 @@ Create MongoDB cloud service at [MongoDB Atlas](https://account.mongodb.com/acco
 2. Go to Network Access -> IP Access List.
 3. Whitelist the Rahti IP address.
 
+NOTE: When using/testing this application locally but using MongoDB Atlas database, local computer's IP has to be whitelisted from MongoDB Atlas's cluster settings.
+
 ### Using PyMongo library
 
 PyMongo is the recommended way to work with MongoDB from Python. Check the newest documentation from PyMongo's homepage: [PyMongo documentation](https://www.mongodb.com/docs/languages/python/pymongo-driver/current/).
@@ -104,7 +106,24 @@ For an image to support running as an arbitrary user, directories and files that
 
 [Redhat's documentation on Openshift platform images](https://docs.redhat.com/en/documentation/openshift_container_platform/4.13/html/images/creating-images#use-uid_create-images) has detailed instructions on how to configure containers to work with this restriction.
 
+Astral's uv package manager is loaded separately to the image from uv's official image.
+
+### Webhook settings
+
+Rahti supports webhooks to trigger automatic rebuilds when code is pushed.
+
+**Setup:**
+1. Create a webhook secret in Rahti (Workloads → Secrets → Create → Webhook secret).
+2. Edit BuildConfig (Actions -> Edit BuildConfig).
+3. Add a GitHub-type trigger with secret you just created.
+4. Copy the webhook URL from Builds → BuildConfigs → Webhooks section.
+5. In GitHub repo, go to Settings → Webhooks → Add webhook.
+6. Paste the URL and set content type to `application/json`.
+
+Note: If GitHub default branch is `main` but Rahti expects `master`, edit the BuildConfig YAML under Source to specify the correct branch ref.
+
 ## Tests and Continuous Integration
+
 This project includes unit and integration tests for the FastAPI backend, ensuring the application works correctly. Tests are written using pytest and cover the following areas:
 
 **Unit-tests:** Ensures correct string output and validation
@@ -116,7 +135,9 @@ This project includes unit and integration tests for the FastAPI backend, ensuri
 1. Run 'uv run pytest'.
 
 ## GitHub Actions CI
+
 The project uses **GitHub Actions** for continuous integration. All tests run automatically on every push and pull request to the main branch.
+
 - Workflow is located at .github/workflows/ci.yml
 - Sets up Python and a virtual environment
 - Installs dependencies and runs unit and integration tests
