@@ -1,6 +1,8 @@
 
 # ContactSearch
 
+[![Python CI](https://github.com/OhjProj2/ContactSearchBackend/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/OhjProj2/ContactSearchBackend/actions/workflows/ci.yml)
+
 An app for searching contact information from websites.
 
 The progam uses LLM to find contact information from list of websites. For example you can provide list of schools and program tries to find principals email, phone number etc.
