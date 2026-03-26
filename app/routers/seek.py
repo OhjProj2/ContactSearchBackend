@@ -43,8 +43,12 @@ async def process_request(parameters: SeekParameters):
 
     async with Timer() as timer:
         result = await fetch_web_page(parameters.url)
-        if not result.success:
-            raise HTTPException(status_code=404, detail="Unable to fetch web page.")
+        if not result or not result.success:
+            error_msg = getattr(result, 'error_message', 'Unknown error')
+            status = 400 if "NAME_NOT_RESOLVED" in error_msg else 500
+            raise HTTPException(status_code=status, detail=f"Web fetch failed: {error_msg}")
+        if not result.markdown or len(result.markdown.strip()) == 0:
+            raise HTTPException(status_code=422, detail="Page content is empty")
         markdown_content = result.markdown
         system_message = SystemMessage(parameters.occupations)
         user_prompt = UserPrompt(markdown_content)

@@ -67,19 +67,21 @@ def test_invalid_input():
     assert response.status_code == 422
 
 
-# Test that the endpoint returns 404 if web page fetch fails
+# Test that the endpoint returns 500 if web page fetch fails
 def test_seek_fetch_fail():
     mock_fetch = AsyncMock()
     mock_fetch.success = False
+    mock_fetch.error_message = "Unable to fetch web page."
+    mock_fetch.status_code = 500
 
     with patch("app.routers.seek.mongodb.ping", new=AsyncMock()), \
          patch("app.routers.seek.fetch_web_page", return_value=mock_fetch):
 
         response = client.post("/seek/", json=valid_payload())
 
-    assert response.status_code == 404
-    assert response.json()["detail"] == "Unable to fetch web page."
-
+    assert response.status_code == 500
+    assert response.json()["detail"] == f"Web fetch failed: {mock_fetch.error_message}"
+    
 
 # Test that response always contains 'data' and 'time' with correct types
 def test_seek_response_structure():
