@@ -9,7 +9,7 @@ settings = Settings()
 router = APIRouter()
 
 
-@router.post("/listalldata")
+@router.get("/listalldata")
 async def listalldata(
     db_name: str = settings.MONGODB_NAME,
     db_collection: str = settings.MONGODB_COLLECTION,
