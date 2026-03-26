@@ -6,7 +6,7 @@ settings = Settings()
 router = APIRouter()
 
 
-@router.post("/listmodels")
+@router.get("/listmodels")
 async def list_models():
     """Router that gets list of model details from Ollama server"""
     async with httpx.AsyncClient() as client:

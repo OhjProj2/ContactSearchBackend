@@ -7,7 +7,7 @@ settings = Settings()
 router = APIRouter()
 
 
-@router.post("/listcollections")
+@router.get("/listcollections")
 async def list_collections(db_name: str = settings.MONGODB_NAME):
     """Router that gets list of all colletions in one database on MongoDB server."""
     try:

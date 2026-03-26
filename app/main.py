@@ -7,6 +7,7 @@ from app.routers.listdbs import router as listdbs_router
 from app.routers.listcollections import router as listcollections_router
 from app.routers.listalldata import router as listalldata_router
 from app.routers.login import router as login_router
+from app.routers.listfields import router as listfields_router
 
 app = FastAPI()
 
@@ -32,3 +33,4 @@ app.include_router(listdbs_router, tags=["List Databases"])
 app.include_router(listcollections_router, tags=["List Collections"])
 app.include_router(listalldata_router, tags=["List Saved Data"])
 app.include_router(login_router, tags=["Authentication"])
+app.include_router(listfields_router, tags=["List Default Contact Detail Fields"])

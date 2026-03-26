@@ -1,7 +1,39 @@
 from pydantic import BaseModel, create_model
 from app.config import Settings
+from dataclasses import dataclass
 
 settings = Settings()
+
+
+@dataclass
+class ContactField:
+    name: str
+    var_name: str
+
+
+# fields that are used in contact details dropdown list in frontend
+default_fields = [
+    ContactField("Occupation", "occupation"),
+    ContactField("Role", "role"),
+    ContactField("Organization", "organization"),
+    ContactField("First name", "first_name"),
+    ContactField("Last name", "last_name"),
+    ContactField("Email", "email"),
+    ContactField("Telephone", "telephone"),
+    ContactField("Street address", "street_address"),
+    ContactField("Postal code", "postal_code"),
+    ContactField("City", "city"),
+    ContactField("Country", "country"),
+    ContactField("Web page", "web_page"),
+    ContactField("Social media (default list)", "social_media"),
+    ContactField("Business ID", "business_id"),
+    ContactField("Company name", "company_name"),
+    ContactField("Non-governmental organization name", "ngo_name"),
+    ContactField("Political party", "political_party"),
+]
+
+# a dictionary mapping used in converting explanatory names to variable/data field names
+field_map = {field.name: field.var_name for field in default_fields}
 
 
 def _contact_type(contact_detail: str) -> tuple:
@@ -20,7 +52,28 @@ def _contact_type(contact_detail: str) -> tuple:
 
 
 def _create_contact_dict(contact_details: list[str]) -> dict:
+    """Takes list of contact details and changes it to a dictionary
+    format the Pydantics create_model method can use to create
+    a ContactList class.
+
+    Args:
+        contact_details: list of contact details to be searched from fetched data
+
+    Returns:
+        contact_dict: dictionary in correct format for create_model method
+    """
     contact_dict = {}
+    # map contact details that match the default list to
+    # default variable names
+    contact_details = [
+        field_map.get(contact_detail, contact_detail)
+        for contact_detail in contact_details
+    ]
+    # tidy contact details to all lowercase and replace
+    # spaces with underscores
+    contact_details = [
+        contact_detail.lower().replace(" ", "_") for contact_detail in contact_details
+    ]
     for c in contact_details:
         contact_dict[c] = _contact_type(c)
     return contact_dict
