@@ -20,6 +20,8 @@ class Settings(BaseSettings):
         MONGODB_URI: Default MongoDB Universal Resource Identifier
         MONGODB_NAME: Default MongoDB database name (one db per one project)
         MONGODB_COLLECTION: Default MongoDB collection name (one collection per one kind of contact details)
+        ADMIN_USERNAME: Frontend access login username
+        ADMIN_PASSWORD: Frontend access login password
     """
 
     OLLAMA_URL: str
