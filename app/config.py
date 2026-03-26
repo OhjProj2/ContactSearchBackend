@@ -34,6 +34,8 @@ class Settings(BaseSettings):
     MONGODB_URI: str
     MONGODB_NAME: str
     MONGODB_COLLECTION: str
+    ADMIN_USERNAME: str
+    ADMIN_PASSWORD: str
 
     model_config = SettingsConfigDict(env_file=ENV_PATH, env_file_encoding="utf-8")
 

@@ -3,7 +3,6 @@ import json
 from fastapi import APIRouter, HTTPException
 from app.services import mongodb
 
-
 router = APIRouter()
 
 
