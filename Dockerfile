@@ -1,5 +1,5 @@
 # Use official Playwright base image which includes browser binaries and system dependencies
-FROM mcr.microsoft.com/playwright:v1.58.2-noble
+FROM mcr.microsoft.com/playwright:v1.57.0-noble
 
 # Install uv from its official Docker image
 COPY --from=ghcr.io/astral-sh/uv:0.10.9 /uv /uvx /bin/
