@@ -28,6 +28,7 @@ def build_ollama_instance(
         top_p=top_p,
         num_predict=num_predict,
         num_ctx=num_ctx,
+        repeat_penalty=settings.OLLAMA_REPEAT_PENALTY,
         # client_kwargs are given straight to httpx client
         # client_kwargs={"verify": False},  # uncomment if using private SSL cert
     )
