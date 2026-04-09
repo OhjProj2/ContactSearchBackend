@@ -44,15 +44,19 @@ async def process_request(parameters: SeekParameters):
     async with Timer() as timer:
         result = await fetch_web_page(parameters.url)
         if not result or not result.success:
-            error_msg = getattr(result, 'error_message', 'Unknown error')
+            error_msg = getattr(result, "error_message", "Unknown error")
             status = 400 if "NAME_NOT_RESOLVED" in error_msg else 500
-            raise HTTPException(status_code=status, detail=f"Web fetch failed: {error_msg}")
+            raise HTTPException(
+                status_code=status, detail=f"Web fetch failed: {error_msg}"
+            )
         if not result.markdown or len(result.markdown.strip()) == 0:
             raise HTTPException(status_code=422, detail="Page content is empty")
         markdown_content = result.markdown
         system_message = SystemMessage(parameters.occupations)
         user_prompt = UserPrompt(markdown_content)
-        messages = build_messages(system_message=system_message, user_prompt=user_prompt)
+        messages = build_messages(
+            system_message=system_message, user_prompt=user_prompt
+        )
         ContactList = build_contact_list_model(parameters.contact_details)
         model: ChatOllama = build_ollama_instance(
             model=parameters.model,
@@ -60,6 +64,8 @@ async def process_request(parameters: SeekParameters):
             top_p=parameters.top_p,
             num_predict=parameters.num_predict,
             num_ctx=parameters.num_ctx,
+            repeat_penalty=parameters.repeat_penalty,
+            timeout=parameters.timeout,
         )
         structured_model = model.with_structured_output(ContactList)
         result = await structured_model.ainvoke(messages)
@@ -69,7 +75,4 @@ async def process_request(parameters: SeekParameters):
         seek_parameters=parameters,
     )
 
-    return {
-        "data": result,
-        "time": round(timer.duration, 4)
-    }
+    return {"data": result, "time": round(timer.duration, 4)}

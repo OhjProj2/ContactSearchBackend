@@ -110,6 +110,7 @@ class SeekParameters(BaseModel):
         top_p: Model nucleus sampling settings (defaults from settings)
         num_predict: Max tokens to predict (defaults from settings)
         num_ctx: Context window size (defaults from settings)
+        repeat_penalty: Scales probability of tokens already appeared (defaults from settings)
         model: Model name (defaults from settings)
         db_uri: MongoDB Universal Resource Identifier
         db_name: MongoDB database name (one db per one project)
@@ -123,6 +124,8 @@ class SeekParameters(BaseModel):
     top_p: float | None = settings.OLLAMA_TOP_P
     num_predict: int | None = settings.OLLAMA_NUM_PREDICT
     num_ctx: int | None = settings.OLLAMA_NUM_CTX
+    repeat_penalty: float | None = settings.OLLAMA_REPEAT_PENALTY
+    timeout: int | None = settings.OLLAMA_TIMEOUT
     model: str | None = settings.OLLAMA_MODEL
     db_uri: str | None = settings.MONGODB_URI
     db_name: str | None = settings.MONGODB_NAME

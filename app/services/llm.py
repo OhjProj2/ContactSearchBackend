@@ -6,7 +6,13 @@ settings = Settings()
 
 
 def build_ollama_instance(
-    model: str, temp: float, top_p: float, num_predict: int, num_ctx: int
+    model: str,
+    temp: float,
+    top_p: float,
+    num_predict: int,
+    num_ctx: int,
+    repeat_penalty: float,
+    timeout: int,
 ) -> ChatOllama:
     """Builds a ChatOllama instance based on model settings and auth credentials.
 
@@ -16,6 +22,8 @@ def build_ollama_instance(
         top_p: nucleus sampling (0.0-1.0)
         num_predict: max number of tokens to predict
         num_ctx: context window size (in tokens)
+        repeat_penalty: scales probability of tokens already appeared
+        timeout: time in seconds until langchain raises timeout error
 
     Returns:
         ChatOllama instance that does the communication with Ollama LLMs
@@ -28,7 +36,8 @@ def build_ollama_instance(
         top_p=top_p,
         num_predict=num_predict,
         num_ctx=num_ctx,
-        repeat_penalty=settings.OLLAMA_REPEAT_PENALTY,
+        repeat_penalty=repeat_penalty,
         # client_kwargs are given straight to httpx client
         # client_kwargs={"verify": False},  # uncomment if using private SSL cert
+        client_kwargs={"timeout": timeout},
     )
