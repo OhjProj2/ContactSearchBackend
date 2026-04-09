@@ -26,6 +26,8 @@ jobs:
       MONGODB_URI: mongodb://localhost:27017
       MONGODB_NAME: testdb
       MONGODB_COLLECTION: testcollection
+      OLLAMA_REPEAT_PENALTY: 1.1
+      OLLAMA_TIMEOUT: 30
 
     steps:
       - name: Checkout repository
