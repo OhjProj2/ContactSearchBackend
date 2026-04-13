@@ -70,9 +70,19 @@ async def process_request(parameters: SeekParameters):
         structured_model = model.with_structured_output(ContactList)
         result = await structured_model.ainvoke(messages)
 
-    await mongodb.add_contact_details(
-        contact_details=result,
-        seek_parameters=parameters,
-    )
+        result_mongo = await mongodb.add_contact_details(
+            contact_details=result,
+            seek_parameters=parameters,
+        )
+        if not result_mongo.acknowledged:
+            raise HTTPException(status_code=500, detail="MongoDB server error")
+        if not result_mongo.inserted_id:
+            raise HTTPException(
+                status_code=500, detail="MongoDB didn't generate id number"
+            )
 
-    return {"data": result, "time": round(timer.duration, 4)}
+    return {
+        "id": str(result_mongo.inserted_id),
+        "data": result,
+        "time": round(timer.duration, 4),
+    }
