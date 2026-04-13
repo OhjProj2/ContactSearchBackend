@@ -106,7 +106,7 @@ def test_seek_response_structure():
 
     data = response.json()
 
-    assert set(data.keys()) == {"data", "time"}
+    assert set(data.keys()) == {"data", "time", "id"}
     assert isinstance(data["time"], float)
 
 
