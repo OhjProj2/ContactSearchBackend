@@ -8,6 +8,7 @@ from app.routers.listcollections import router as listcollections_router
 from app.routers.listalldata import router as listalldata_router
 from app.routers.login import router as login_router
 from app.routers.listfields import router as listfields_router
+from app.routers.copybyid import router as copybyid_router
 
 app = FastAPI()
 
@@ -34,3 +35,4 @@ app.include_router(listcollections_router, tags=["List Collections"])
 app.include_router(listalldata_router, tags=["List Saved Data"])
 app.include_router(login_router, tags=["Authentication"])
 app.include_router(listfields_router, tags=["List Default Contact Detail Fields"])
+app.include_router(copybyid_router, tags=["Copy document to db+collection"])
