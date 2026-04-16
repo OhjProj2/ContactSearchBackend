@@ -1,6 +1,6 @@
 import asyncio
 from bson import ObjectId
-
+import polars as pl
 from fastapi import HTTPException
 from pymongo import AsyncMongoClient
 from pymongo.server_api import ServerApi
@@ -89,6 +89,52 @@ async def get_all_data(db_name: str, db_collection: str):
             status_code=500, detail=f"Read from database failed: {str(e)}"
         )
     return result
+
+
+async def get_all_contact_data(db_name: str, db_collection: str):
+    """Asynchronous method that fetches all contact data from specific collection.
+
+    Args:
+        db_name: name of the database
+        db_collection: name of the collection in given database
+
+    Raises:
+        HTTPException: In case of any error
+    Return:
+        All data of single collection.
+    """
+    db = client[db_name]
+    collection = db[db_collection]
+    try:
+        # get only data under contact_details, drop id number
+        cursor = collection.find({}, {"contact_details": 1, "_id": 0})
+        result = await cursor.to_list(length=None)
+        contacts = [
+            contact
+            for doc in result
+            if "contact_details" in doc
+            for contact in doc["contact_details"].get("contacts", [])
+        ]
+        df = pl.DataFrame(contacts)
+        # if social_media column among column_names, unnest it so every social
+        # media gets its own column
+        if "social_media" in df.columns:
+            # if duplicate column names, rename the unnested column by adding
+            # '_nested' to its end
+            df = df.with_columns(
+                pl.col("social_media").struct.rename_fields(
+                    [
+                        f"{f}_nested" if f in df.columns else f
+                        for f in df["social_media"].struct.fields
+                    ]
+                )
+            ).unnest("social_media")
+        return df.to_dicts()
+
+    except Exception as e:
+        raise HTTPException(
+            status_code=500, detail=f"Read from database failed: {str(e)}"
+        )
 
 
 async def _get_data_by_id(
