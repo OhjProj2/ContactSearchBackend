@@ -1,5 +1,5 @@
 from langchain_ollama import ChatOllama
-
+import httpx
 from app.config import Settings
 
 settings = Settings()
@@ -39,5 +39,7 @@ def build_ollama_instance(
         repeat_penalty=repeat_penalty,
         # client_kwargs are given straight to httpx client
         # client_kwargs={"verify": False},  # uncomment if using private SSL cert
-        client_kwargs={"timeout": timeout},
+        client_kwargs={
+            "timeout": httpx.Timeout(60.0, connect=10.0, read=timeout, write=10.0)
+        },
     )

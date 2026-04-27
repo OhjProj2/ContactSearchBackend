@@ -1,3 +1,5 @@
+import asyncio
+
 from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from langchain_ollama import ChatOllama
@@ -68,7 +70,14 @@ async def process_request(parameters: SeekParameters):
             timeout=parameters.timeout,
         )
         structured_model = model.with_structured_output(ContactList)
-        result = await structured_model.ainvoke(messages)
+        try:
+            async with asyncio.timeout(parameters.timeout):
+                result = await structured_model.ainvoke(messages)
+        except TimeoutError:
+            raise HTTPException(
+                status_code=504,
+                detail=f"Call timed out after {parameters.timeout} s",
+            )
 
         result_mongo = await mongodb.add_contact_details(
             contact_details=result,
