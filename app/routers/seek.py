@@ -84,9 +84,10 @@ async def process_request(parameters: SeekParameters):
 
             # All contact details from multiple URLs are shown in single output to the frontend
             # but saved under separate documents. List of ids is returned.
+            current_parameters = parameters.model_copy(update={"url": [url]})
             result_mongo = await mongodb.add_contact_details(
                 contact_details=result,
-                seek_parameters=parameters,
+                seek_parameters=current_parameters,
             )
             if not result_mongo.acknowledged:
                 raise HTTPException(status_code=500, detail="MongoDB server error")
