@@ -119,7 +119,7 @@ class SeekParameters(BaseModel):
 
     contact_details: list[str]
     occupations: list[str]
-    url: str
+    url: list[str]
     temp: float | None = settings.OLLAMA_TEMPERATURE
     top_p: float | None = settings.OLLAMA_TOP_P
     num_predict: int | None = settings.OLLAMA_NUM_PREDICT
