@@ -1,16 +1,23 @@
 from fastapi.testclient import TestClient
 from unittest.mock import AsyncMock, patch
 from pymongo.errors import ConnectionFailure
+from types import SimpleNamespace
+
 
 from app.main import app
 
 client = TestClient(app)
 
+def mock_contact_result():
+    return SimpleNamespace(
+        contacts=[SimpleNamespace(name="John Doe", email="john@example.com")]
+    )
+
 
 # Returns a valid request body used in tests
 def valid_payload():
     return {
-        "url": "https://example.com",
+        "url": ["https://example.com"],
         "occupations": ["CEO"],
         "contact_details": ["email"],
         "model": "llama3",
@@ -28,7 +35,7 @@ def test_seek_success():
     mock_fetch.success = True
     mock_fetch.markdown = "Some content"
 
-    mock_llm_result = {"name": "John Doe", "email": "john@example.com"}
+    mock_llm_result = mock_contact_result()
 
     with patch("app.routers.seek.mongodb.ping", new=AsyncMock()), \
          patch("app.routers.seek.fetch_web_page", return_value=mock_fetch), \
@@ -47,7 +54,7 @@ def test_seek_success():
     data = response.json()
     assert "data" in data
     assert "time" in data
-    assert data["data"] == mock_llm_result
+    assert "contacts" in data["data"]
 
 
 # Test that the endpoint returns 503 if database connection fails
@@ -89,7 +96,7 @@ def test_seek_response_structure():
     mock_fetch.success = True
     mock_fetch.markdown = "Some content"
 
-    mock_llm_result = {"name": "John Doe"}
+    mock_llm_result = mock_contact_result()
 
     with patch("app.routers.seek.mongodb.ping", new=AsyncMock()), \
          patch("app.routers.seek.fetch_web_page", return_value=mock_fetch), \
@@ -116,7 +123,7 @@ def test_seek_saves_to_db():
     mock_fetch.success = True
     mock_fetch.markdown = "Some content"
 
-    mock_llm_result = {"name": "John Doe"}
+    mock_llm_result = mock_contact_result()
 
     with patch("app.routers.seek.mongodb.ping", new=AsyncMock()), \
          patch("app.routers.seek.fetch_web_page", return_value=mock_fetch), \
@@ -149,7 +156,32 @@ def test_empty_llm_response():
 
         mock_model = mock_ollama.return_value
         mock_structured = mock_model.with_structured_output.return_value
-        mock_structured.ainvoke = AsyncMock(return_value={})
+        mock_structured.ainvoke = AsyncMock(return_value=mock_contact_result())
+
+        response = client.post("/seek/", json=valid_payload())
+
+    assert response.status_code == 200
+
+# Test that the /seek endpoint successfully processes a valid request end-to-end with mocked dependencies
+def test_seek_happy_path():
+    mock_fetch = AsyncMock()
+    mock_fetch.success = True
+    mock_fetch.markdown = "Some content"
+
+    mock_result = SimpleNamespace(
+        contacts=[SimpleNamespace(name="John Doe", email="john@example.com")]
+    )
+
+    with patch("app.routers.seek.mongodb.ping", new=AsyncMock()), \
+         patch("app.routers.seek.fetch_web_page", return_value=mock_fetch), \
+         patch("app.routers.seek.build_messages", return_value=["msg"]), \
+         patch("app.routers.seek.build_contact_list_model"), \
+         patch("app.routers.seek.build_ollama_instance") as mock_ollama, \
+         patch("app.routers.seek.mongodb.add_contact_details", new=AsyncMock()):
+
+        mock_model = mock_ollama.return_value
+        mock_structured = mock_model.with_structured_output.return_value
+        mock_structured.ainvoke = AsyncMock(return_value=mock_result)
 
         response = client.post("/seek/", json=valid_payload())
 
