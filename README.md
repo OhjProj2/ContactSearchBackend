@@ -144,3 +144,5 @@ The project uses **GitHub Actions** for continuous integration. All tests run au
 - Sets up Python and a virtual environment
 - Installs dependencies and runs unit and integration tests
 - Test results are reported directly in GitHub Actions
+
+ContactSearch is licensed under [MIT license](./LICENSE.md).
